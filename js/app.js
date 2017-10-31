@@ -19,6 +19,11 @@ let hackernews = {
 	source: 'hn',
 };
 
+let dailywtf = {
+	url: 'https://accesscontrolalloworiginall.herokuapp.com/https://thedailywtf.com/api/articles/recent/10',
+	source: 'dailywtf',
+}
+
 let guardiannews = {
 	api: 'https://content.guardianapis.com/search?api-key=',
 	key: 'db045aa3-693a-4609-a87e-e895500f7a80',
@@ -35,6 +40,28 @@ function postDigg(url, source){
 	.done(function(result){
 		console.log(result.data.feed);
 		result.data.feed.forEach(function(element, index){
+			//Digg content
+			let content = createContent(result, element, source);
+			console.log(content);
+			// Creating a template
+			let template = templateHTML(content, index);
+			$("#main").append(template);
+			//Adding an event listener to the new content
+			addEventListener(content, index);
+			globalIndex++;
+		})
+	})
+}
+
+function postDailyWTF(url, source){
+	// debugger;
+	$.get(url, function(){
+		console.log("succeded");
+	})
+	.done(function(result){
+		console.log("DailyWTF:");
+		console.log(result);
+		result.forEach(function(element, index){
 			//Digg content
 			let content = createContent(result, element, source);
 			console.log(content);
@@ -120,6 +147,17 @@ function createContent(result, element, source){
 		};
 		return articleContent;
 	}
+	if (source === "dailywtf"){
+		var articleContent = {
+			title: element.Title,
+			description: element.Series.Description,
+		  	score: element.CachedCommentCount,
+			image: element.Author.ImageUrl,
+			tag: element.Slug,
+			url: element.Url,
+		};
+		return articleContent;
+	}
 }
 
 function templateHTML(content, index){
@@ -155,9 +193,9 @@ function addEventListener(content, index){
 }
 
  $( document ).ready(function() {
- 	loadingOn();
 	postDigg(digg.url, digg.source);
 	postHackerNews(hackernews.url, hackernews.source);
+	postDailyWTF(dailywtf.url, dailywtf.source);
 	// postGuardian(guardiannews.url, guardiannews.source);
 	loadingOff();
  });
@@ -180,11 +218,20 @@ $('.hackernews').click( function(){
 	loadingOff();
 });
 
+$('.dailywtf').click( function(){
+	loadingOn();
+	$( "#main" ).children().remove();
+	postDailyWTF(dailywtf.url, dailywtf.source);
+	$(".source").html("DailyWTF");
+	loadingOff();
+});
+
 $('#feedr').click( function(){
 	loadingOn();
 	$( "#main" ).children().remove();
 	postDigg(digg.url, digg.source);
 	postHackerNews(hackernews.url, hackernews.source);
+	postDailyWTF(dailywtf.url, dailywtf.source);
 	loadingOff();
 });
 
