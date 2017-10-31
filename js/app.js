@@ -232,6 +232,7 @@ $('#feedr').click( function(){
 	postDigg(digg.url, digg.source);
 	postHackerNews(hackernews.url, hackernews.source);
 	postDailyWTF(dailywtf.url, dailywtf.source);
+	$(".source").html("Source Name");
 	loadingOff();
 });
 
